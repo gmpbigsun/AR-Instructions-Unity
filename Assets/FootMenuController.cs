@@ -4,13 +4,22 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FootMenuController : MonoBehaviour
 {
-    public Interactable MarkerScanInteractable;
-    public Interactable HomeInteractable;
-    public Interactable OffsetInteractable;
-    public GameObject BackplateQuad;
+    public UnityEvent MarkerScanClicked;
+    public UnityEvent HomeClicked;
+    public UnityEvent OffsetClicked;
+
+    [SerializeField]
+    private Interactable MarkerScanInteractable;
+    [SerializeField]
+    private Interactable HomeInteractable;
+    [SerializeField]
+    private Interactable OffsetInteractable;
+    [SerializeField]
+    private GameObject BackplateQuad;
 
     public float CellWidth = 0.042f;
     public float Maring = 0.01f;
@@ -21,6 +30,10 @@ public class FootMenuController : MonoBehaviour
         {
             throw new NullReferenceException("Missing Reference in FootMenuController.");
         }
+
+        MarkerScanInteractable.OnClick.AddListener(() => { MarkerScanClicked?.Invoke(); });
+        HomeInteractable.OnClick.AddListener(() => { HomeClicked?.Invoke(); });
+        OffsetInteractable.OnClick.AddListener(() => { OffsetClicked?.Invoke(); });
     }
 
     public void ChangeMode(MenuMode mode)

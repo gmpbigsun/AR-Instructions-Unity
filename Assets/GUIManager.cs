@@ -6,17 +6,23 @@ using UnityEngine;
 
 public class GUIManager : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject SelectMenuPrefab;
+    [SerializeField]
+    private GameObject FootMenuPrefab;
+    [SerializeField]
+    private GameObject InstructionMenuPrefab;
+    [SerializeField]
+    private GameObject EnterNamePrefab;
+    [SerializeField]
+    private GameObject ParentForInstructionHolograms;
+    [SerializeField]
+    private StabilizedTracking StabilizedTracking;
+    [SerializeField]
+    private GameObject OffsetHandler;
 
-    public GameObject SelectMenuPrefab;
-    public GameObject FootMenuPrefab;
-    public GameObject InstructionMenuPrefab;
-    public GameObject EnterNamePrefab;
-    public GameObject ParentForInstructionHolograms;
-    public StabilizedTracking StabilizedTracking;
-    public GameObject OffsetHandler;
-
-    private GameObject _selectMenu;
-    private GameObject _footMenu;
+    private SelectInstructionMenuController _selectMenuController;
+    private FootMenuController _footMenuController;
     private GameObject _instructionMenu;
     private GameObject _enterName;
     private MenuMode _mode = MenuMode.Replay;
@@ -24,7 +30,7 @@ public class GUIManager : MonoBehaviour
 
     public void Start()
     {
-        if(SelectMenuPrefab == null ||
+        if (SelectMenuPrefab == null ||
             FootMenuPrefab == null ||
             InstructionMenuPrefab == null ||
             EnterNamePrefab == null)
@@ -37,17 +43,22 @@ public class GUIManager : MonoBehaviour
             ParentForInstructionHolograms = GameObject.Find("Offset");
         }
 
-        InstructionManager.Instance.ImportCompleted += OnCompleted;
-
-
-        _footMenu = Instantiate(FootMenuPrefab);
-        _footMenu.GetComponent<FootMenuController>().HomeInteractable.OnClick.AddListener(FootMenu_OnHomeClick);
-        _footMenu.GetComponent<FootMenuController>().MarkerScanInteractable.OnClick.AddListener(FootMenu_OnMarkerScanClick);
-        _footMenu.GetComponent<FootMenuController>().OffsetInteractable.OnClick.AddListener(FootMenu_OnOffsetClick);
-
+        InstructionManager.Instance.ImportCompleted += ImportOnCompleted;
+        CreateFootMenu();
         CreateSelectMenu();
-        
+    }
 
+    private void ImportOnCompleted(object sender, EventArgs e)
+    {
+        CreateSelectMenu();
+    }
+
+    private void CreateFootMenu()
+    {
+        _footMenuController = Instantiate(FootMenuPrefab).GetComponent<FootMenuController>();
+        _footMenuController.HomeClicked.AddListener(FootMenu_OnHomeClick);
+        _footMenuController.MarkerScanClicked.AddListener(FootMenu_OnMarkerScanClick);
+        _footMenuController.OffsetClicked.AddListener(FootMenu_OnOffsetClick);
     }
 
     private void FootMenu_OnOffsetClick()
@@ -55,40 +66,32 @@ public class GUIManager : MonoBehaviour
         OffsetHandler.SetActive(true);
     }
 
-    private void OnCompleted(object sender, EventArgs e)
-    {
-        CreateSelectMenu();
-        //ShowInstructionMenu(MenuMode.Record);
-    }
-
     private void CreateSelectMenu()
     {
-        _selectMenu = Instantiate(SelectMenuPrefab);
-        _selectMenu.GetComponent<SelectInstructionMenuController>().CreateNewInstructionInteractable.OnClick.AddListener(SelectInstructionMenu_OnCreateNewInstructionClick);
-        _selectMenu.GetComponent<SelectInstructionMenuController>().ImportInstructionInteractable.OnClick.AddListener(SelectInstructionMenu_OnImportInstructionClick);
-        _selectMenu.GetComponent<SelectInstructionMenuController>().InstructionSelected += SelectInstructionMenu_OnSelect;
-        _selectMenu.GetComponent<SelectInstructionMenuController>().ModeChanged += SelectInstructionMenu_ModeChanged;
+        _selectMenuController = Instantiate(SelectMenuPrefab).GetComponent<SelectInstructionMenuController>();
+        _selectMenuController.CreateNewInstructionClicked.AddListener(SelectInstructionMenu_OnCreateNewInstructionClick);
+        _selectMenuController.ImportInstructionClicked.AddListener(SelectInstructionMenu_OnImportInstructionClick);
+        _selectMenuController.InstructionSelected += SelectInstructionMenu_OnSelect;
+        _selectMenuController.ModeChanged += SelectInstructionMenu_ModeChanged;
     }
 
     private void SelectInstructionMenu_ModeChanged(object sender, ModeChangedEventArgs e)
     {
         _mode = e.Mode;
-
-        _footMenu.GetComponent<FootMenuController>().ChangeMode(_mode);
+        _footMenuController.ChangeMode(_mode);
     }
 
     private void FootMenu_OnMarkerScanClick()
     {
         StabilizedTracking.Reset();
-
     }
 
     private void FootMenu_OnHomeClick()
     {
-        Reset();
+        ResetAllGuiElements();
     }
 
-    private void Reset()
+    private void ResetAllGuiElements()
     {
         InstructionManager.Instance.Reset();
         Destroy(_enterName);
@@ -134,7 +137,7 @@ public class GUIManager : MonoBehaviour
     }
     private void SelectInstructionMenu_OnSelect(object sender, InstructionSelectionEventArgs e)
     {
-        ShowInstructionMenu(_selectMenu.GetComponent<SelectInstructionMenuController>().Mode);
+        ShowInstructionMenu(_selectMenuController.Mode);
         ParentForInstructionHolograms.GetComponent<OffsetController>().SetTransform(InstructionManager.Instance.Instruction.OffsetForHolograms);
         
         DestroySelectMenu();
@@ -160,7 +163,7 @@ public class GUIManager : MonoBehaviour
             var mainPanelController = _instructionMenu.GetComponentInChildren<MainPanelController>();
             if (mainPanelController != null)
             {
-                mainPanelController.HomeButtonClicked.AddListener(Reset);
+                mainPanelController.HomeButtonClicked.AddListener(ResetAllGuiElements);
             }
             else
             {
@@ -175,14 +178,14 @@ public class GUIManager : MonoBehaviour
 
     private void DestroySelectMenu()
     {
-        if (_selectMenu != null)
+        if (_selectMenuController != null)
         {
-            _selectMenu.GetComponent<SelectInstructionMenuController>().CreateNewInstructionInteractable.OnClick.RemoveAllListeners();
-            _selectMenu.GetComponent<SelectInstructionMenuController>().ImportInstructionInteractable.OnClick.RemoveAllListeners();
-            _selectMenu.GetComponent<SelectInstructionMenuController>().InstructionSelected -= SelectInstructionMenu_OnSelect;
+            _selectMenuController.CreateNewInstructionClicked.RemoveAllListeners();
+            _selectMenuController.ImportInstructionClicked.RemoveAllListeners();
+            _selectMenuController.InstructionSelected -= SelectInstructionMenu_OnSelect;
 
-            Destroy(_selectMenu);
-            _selectMenu = null;
+            Destroy(_selectMenuController.gameObject);
+            _selectMenuController = null;
         }
     }
 }

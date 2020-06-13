@@ -1,27 +1,34 @@
 ﻿using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SelectInstructionMenuController : MonoBehaviour
 {
     public MenuMode Mode { get; private set; }
 
-    public GameObject ItemParent;
-    public GameObject ItemPrefab;
-    public int NumberOfItemsToShow = 6;
+    [SerializeField]
+    private GameObject ItemParent;
+    [SerializeField]
+    private GameObject ItemPrefab;
+    [SerializeField]
+    private int NumberOfItemsToShow = 6;
+    [SerializeField]
+    private TextMeshPro PageCounterText;
+    [SerializeField]
+    private GameObject NextPageButton;
+    [SerializeField]
+    private GameObject PreviousPageButton;
+    [SerializeField]
+    private Interactable ImportButton;
+    [SerializeField]
+    private Interactable CreateButton;
 
-    public TextMeshPro PageCounterText;
-    public GameObject NextPageButton;
-    public GameObject PreviousPageButton;
-
-    public Interactable CreateNewInstructionInteractable;
-    public Interactable ImportInstructionInteractable;
+    public UnityEvent CreateNewInstructionClicked;
+    public UnityEvent ImportInstructionClicked;
 
     public event EventHandler<InstructionSelectionEventArgs> InstructionSelected;
     public event EventHandler<ModeChangedEventArgs> ModeChanged;
@@ -29,15 +36,13 @@ public class SelectInstructionMenuController : MonoBehaviour
     private int _currentPage = 1;
     private int _maxPageNumber;
 
-
-
     // Start is called before the first frame update
     void Start()
     {
         Mode = MenuMode.Replay;
-
-        
+                
         var items = InstructionManager.Instance.GetInstructionNamesForPage(0, NumberOfItemsToShow);
+        
         LoadItemsToMenu(items);
 
         if (PageCounterText != null)
@@ -53,6 +58,9 @@ public class SelectInstructionMenuController : MonoBehaviour
 
         NextPageButton.SetActive(InstructionManager.Instance.Count > NumberOfItemsToShow);
         PreviousPageButton.SetActive(false);
+
+        CreateButton.OnClick.AddListener(() => { CreateNewInstructionClicked?.Invoke(); });
+        ImportButton.OnClick.AddListener(() => { ImportInstructionClicked?.Invoke(); });
     }
 
     public void SetEditMode(bool mode)

@@ -108,8 +108,14 @@ MonoBehaviour:
   PageCounterText: {fileID: 8063900688688782272}
   NextPageButton: {fileID: 8019589554015982839}
   PreviousPageButton: {fileID: 3629189498088720957}
-  CreateNewInstructionInteractable: {fileID: 9069825437635051158}
-  ImportInstructionInteractable: {fileID: 3870190714603753047}
+  ImportButton: {fileID: 3870190714603753047}
+  CreateButton: {fileID: 9069825437635051158}
+  CreateNewInstructionClicked:
+    m_PersistentCalls:
+      m_Calls: []
+  ImportInstructionClicked:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1403640373451726297
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,6 +560,9 @@ MonoBehaviour:
   orientType: 0
   layout: 1
   anchor: 4
+  anchorAlongAxis: 0
+  columnAlignment: 0
+  rowAlignment: 0
   radius: 2
   radialRange: 180
   distance: 0
@@ -1605,6 +1614,11 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 0.0204
       objectReference: {fileID: 0}
+    - target: {fileID: 4093808206858475129, guid: daa0726e9f4321044bc455f2849304f1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4093808206893841460, guid: daa0726e9f4321044bc455f2849304f1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2085,7 +2099,7 @@ PrefabInstance:
     - target: {fileID: 2204069623052342159, guid: 3f1f46cbecbe08e46a303ccfdb5b498a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a,
         type: 3}
@@ -2522,7 +2536,7 @@ PrefabInstance:
     - target: {fileID: 2204069623052342159, guid: 3f1f46cbecbe08e46a303ccfdb5b498a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a,
         type: 3}

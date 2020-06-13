@@ -1,7 +1,7 @@
 <Project ToolsVersion="15.0">
   <PropertyGroup>
 	<UnityPlatform>$(UnityCurrentPlatform)</UnityPlatform>
-    <ProjectGuid>FCA993B7-4451-46AC-9FE3-6B9E65E0B5F7</ProjectGuid>
+    <ProjectGuid>FFD11F69-D77F-4267-9736-1EAB527C1880</ProjectGuid>
     <UnityConfiguration>InEditor</UnityConfiguration>
     <!-- Make sure Unity ignores the contents of the intermediate output path. -->
     <BaseIntermediateOutputPath>$(MSBuildForUnityBuildOutputDirectory)\obj\Dependencies</BaseIntermediateOutputPath>
@@ -26,9 +26,7 @@
 
   <ItemGroup>
     <!--PROJECT_REFERENCE_TEMPLATE_START-->
-    <ProjectReference Include="C:\Users\FlorianJasche\Documents\GitHub\AR-Instructions-Unity\Assets\MRTK\Providers\WindowsMixedReality\Shared\DotNetAdapter\DotNetAdapter.csproj" Condition="">
-        <!--PRIVATE_REFERENCE_TEMPLATE_START--><!--PRIVATE_REFERENCE_TEMPLATE_END-->
-    </ProjectReference>
+    
     <!--PROJECT_REFERENCE_TEMPLATE_END-->
   </ItemGroup>
 </Project>
