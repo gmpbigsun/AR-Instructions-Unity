@@ -1,102 +1,109 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class PhotoVideoPanelController : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject PreviousMediaFileButton;
+    [SerializeField]
+    private GameObject NextMediaFileButton;
+    [SerializeField]
+    private LoadImageToQuad ImageLoader;
+    [SerializeField]
+    private LoadVideoToQuad VideoLoader;
+    [SerializeField]
+    private TextMeshPro MediaFileCounterText;
+    [SerializeField]
+    private TextMeshPro VideoTimerText;
+    [SerializeField]
+    private GameObject TakePhotoButton;
+    [SerializeField]
+    private GameObject TakeVideoButton;
+    [SerializeField]
+    private GameObject DeleteButton;
+    [SerializeField]
+    private ObservableCollection<MediaFile> _mediaFiles;
 
-    public GameObject PreviousMediaFileButton;
-    public GameObject NextMediaFileButton;
-
-    public LoadImageToQuad ImageLoader;
-    public LoadVideoToQuad VideoLoader;
-
-    public TextMeshPro MediaFileCounterText;
-    public TextMeshPro VideoTimerText;
-    
     public UnityEvent OnNewData;
-    public GameObject TakePhotoButton;
-    public GameObject TakeVideoButton;
-    public GameObject DeleteButton;
+
+    
+
 
     private int _currentMediaIndex;
-    private List<MediaFile> _mediaFiles;
-
+    //private List<MediaFile> _mediaFiles;
     private MenuMode _mode;
 
-    public void Reset(List<MediaFile> newMediaFiles)
+    /// <summary>
+    /// resets the PhotoVideoPanel
+    /// </summary>
+    /// <param name="newMediaFiles">List of media files to display</param>
+    public void Reset(ObservableCollection<MediaFile> newMediaFiles)
     {
+        _currentMediaIndex = 0;
         _mediaFiles = newMediaFiles;
         PreviousMediaFileButton.gameObject.SetActive(false);
-        if (_mediaFiles.Count > 0)
+        //turn next button only on when there is more than 1 mediafile
+        NextMediaFileButton.gameObject.SetActive(_mediaFiles.Count > 1 ? true : false);
+        SetMediaFileCounter(_currentMediaIndex + 1, _mediaFiles.Count);
+        VideoTimerText.text = string.Empty;
+
+        if (_mediaFiles.Count > 0) // there are media files
         {
-            _currentMediaIndex = 0;
-            var mediaFile = _mediaFiles[0];
-
-            LoadMediaFile(mediaFile);
-
-            //turn next button only on when there is more than 1 mediafile
-            NextMediaFileButton.gameObject.SetActive(_mediaFiles.Count > 1 ? true : false);
-            SetMediaFileCounter(_currentMediaIndex + 1, _mediaFiles.Count);
+            LoadMediaFile(_mediaFiles[0]);
 
             if(_mode == MenuMode.Record)
             {
                 DeleteButton.SetActive(true);
             }
         }
-        else
+        else // there are no media files
         {
-            _currentMediaIndex = 0;
-            ImageLoader.LoadImageToQuadByFileName();
-            SetMediaFileCounter(0,0);
-            VideoTimerText.text = string.Empty;
-            PreviousMediaFileButton.gameObject.SetActive(false);
-            NextMediaFileButton.gameObject.SetActive(false);
+            ImageLoader.LoadImageToQuadByFileName(); //load default (placeholder) image
             DeleteButton.SetActive(false);
         }
-        
     }
 
-    
+    /// <summary>
+    /// set the mode of the PhotoVideoPanel
+    /// </summary>
+    /// <param name="mode"></param>
     public void SetMode(MenuMode mode)
     {
         _mode = mode;
 
-        if (mode == MenuMode.Replay)
-        {
-            TakePhotoButton.SetActive(false);
-            TakeVideoButton.SetActive(false);
-            DeleteButton.SetActive(false);
-        }
+        //deactivate buttons on replay mode
+        TakePhotoButton.SetActive(mode == MenuMode.Replay ? false : true);
+        TakeVideoButton.SetActive(mode == MenuMode.Replay ? false : true);
+        DeleteButton.SetActive(mode == MenuMode.Replay ? false : true);
     }
 
     public void LoadNextMediaFile()
     {
         if (_mediaFiles != null)
         {
+            // check if there is a next media file
             if (_mediaFiles.Count > 1 && _currentMediaIndex + 1 < _mediaFiles.Count)
             {
                 _currentMediaIndex++;
-
-                var mediaFile = _mediaFiles[_currentMediaIndex];
-                LoadMediaFile(mediaFile);
+                LoadMediaFile(_mediaFiles[_currentMediaIndex]);
 
                 PreviousMediaFileButton.gameObject.SetActive(true);
 
+               
                 if (_currentMediaIndex + 1 >= _mediaFiles.Count)
                 {
                     NextMediaFileButton.gameObject.SetActive(false);
                 }
 
                 SetMediaFileCounter(_currentMediaIndex + 1, _mediaFiles.Count);
-                
             }
         }
     }
-
 
     private void LoadMediaFile(MediaFile mediaFile)
     {
@@ -113,12 +120,13 @@ public class PhotoVideoPanelController : MonoBehaviour
 
     public void LoadPreivousMediaFile()
     {
+        //check if there is a previous media file
         if (_currentMediaIndex - 1 >= 0)
         {
             _currentMediaIndex--;
-            var mediaFile = _mediaFiles[_currentMediaIndex];
-            LoadMediaFile(mediaFile);
+            LoadMediaFile(_mediaFiles[_currentMediaIndex]);
 
+            //check if previous media file is first. if it is, disable the previous button
             if (_currentMediaIndex <= 0)
             {
                 PreviousMediaFileButton.gameObject.SetActive(false);
@@ -168,12 +176,17 @@ public class PhotoVideoPanelController : MonoBehaviour
     private void NewData()
     {
         OnNewData?.Invoke();
-        InstructionManager.Instance.Save();
+        //InstructionManager.Instance.Save();
     }
 
-    private void SetMediaFileCounter(int currentMediaIndex, int count)
+    /// <summary>
+    /// Sets the text of the the current selected media file / count of media files
+    /// </summary>
+    /// <param name="currentMediaNumber">Number of current media file. 1 based counting</param>
+    /// <param name="count">the count of media files</param>
+    private void SetMediaFileCounter(int currentMediaNumber, int count)
     {
-        MediaFileCounterText.text = currentMediaIndex + "/" + count;
+        MediaFileCounterText.text = currentMediaNumber + "/" + count;
     }
 
     public void OnDeleteCurrentFile()
@@ -211,7 +224,7 @@ public class PhotoVideoPanelController : MonoBehaviour
             LoadPreivousMediaFile();
         }
         OnNewData?.Invoke();
-        InstructionManager.Instance.Save();
+        //InstructionManager.Instance.Save();
 
         //if (_currentMediaIndex > 0)
         //{

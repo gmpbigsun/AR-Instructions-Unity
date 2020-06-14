@@ -96,17 +96,19 @@ public class MenuController : MonoBehaviour
         PhotoPanel.GetComponent<PhotoVideoPanelController>().SetMode(mode);
 
         MainPanel.SetActive(true);
-        MainPanel.GetComponent<MainPanelController>().Init(mode, _containerForSpawnedItems);
+        MainPanel.GetComponent<MainPanelController>().Init(mode,"",0,"");
 
         if (mode == MenuMode.Record) //|| _mode == MenuMode.Edit
         {
             ItemPanel.SetActive(true);
-            ItemPanel.GetComponent<ItemPanelController>().ContainerForSpawnedItems = _containerForSpawnedItems;
-            PhotoPanel.GetComponent<PhotoVideoPanelController>().Reset(_instructionManager.GetCurrentMediaFiles());
+            //ItemPanel.GetComponent<ItemPanelController>().ContainerForSpawnedItems = _containerForSpawnedItems;
+#warning !!!
+            //PhotoPanel.GetComponent<PhotoVideoPanelController>().Reset(_instructionManager.GetCurrentMediaFiles());
         }
         else
         {
-            PhotoPanel.GetComponent<PhotoVideoPanelController>().Reset(_instructionManager.GetCurrentMediaFiles());
+#warning !!!
+            //PhotoPanel.GetComponent<PhotoVideoPanelController>().Reset(_instructionManager.GetCurrentMediaFiles());
         }
 
     }
@@ -114,8 +116,9 @@ public class MenuController : MonoBehaviour
     public void Reset()
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() => { 
-            MainPanel.GetComponent<MainPanelController>().Reset();
-            PhotoPanel.GetComponent<PhotoVideoPanelController>().Reset(_instructionManager.GetCurrentMediaFiles());
+            //MainPanel.GetComponent<MainPanelController>().Reset();
+#warning !!!
+            //PhotoPanel.GetComponent<PhotoVideoPanelController>().Reset(_instructionManager.GetCurrentMediaFiles());
         });
     }
 

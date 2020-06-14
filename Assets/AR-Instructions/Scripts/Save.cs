@@ -2,17 +2,27 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using UnityEngine;
 
 [System.Serializable]
-public class Instruction
+public class Instruction : INotifyPropertyChanged
 {
-    public List<Step> Steps = new List<Step>();
-    public String Name;
+    private ObservableCollection<Step> Steps;
+    public string Name;
     public DateTime DateCreated;
     public SerializableTransform OffsetForHolograms;
 
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    }
     public int StepsCount {
         get
         {
@@ -20,20 +30,40 @@ public class Instruction
         }
     }
 
+    private void Steps_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        NotifyPropertyChanged(sender.ToString());
+    }
     public Instruction(string name, DateTime dateCreated)
     {
         Name = name;
         DateCreated = dateCreated;
-        Steps = new List<Step>();
+        Steps = new ObservableCollection<Step>();
+        Steps.CollectionChanged += Steps_CollectionChanged;
         OffsetForHolograms = new SerializableTransform();
     }
+
 
     public Instruction()
     {
         Name = "default";
         DateCreated = DateTime.Now;
-        Steps = new List<Step>();
+        Steps = new ObservableCollection<Step>();
+        Steps.CollectionChanged += Steps_CollectionChanged;
         OffsetForHolograms = new SerializableTransform();
+    }
+
+    public Step AddStep()
+    {
+        var step = new Step(Steps.Count);
+        step.PropertyChanged += Step_PropertyChanged;
+        Steps.Add(step);
+        return step;
+    }
+
+    private void Step_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        NotifyPropertyChanged(sender.ToString() + " " + e.PropertyName );
     }
 }
 
@@ -96,18 +126,32 @@ public class SerializableTransform
 }
 
 [System.Serializable]
-public class Step
+public class Step: INotifyPropertyChanged
 {
     public int StepNumber;
-    public List<Item> Items = new List<Item>();
-    public List<MediaFile> MediaFiles = new List<MediaFile>();
     public String Text;
+    public event PropertyChangedEventHandler PropertyChanged;
 
+    private ObservableCollection<Item> Items;
+    private ObservableCollection<MediaFile> MediaFiles;
+
+
+    private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private void CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        NotifyPropertyChanged(sender.ToString());
+    }
     public Step()
     {
         StepNumber = -1;
-        Items = null;
-        MediaFiles = null;
+        Items = new ObservableCollection<Item>();
+        Items.CollectionChanged += CollectionChanged;
+        MediaFiles = new ObservableCollection<MediaFile>();
+        MediaFiles.CollectionChanged += CollectionChanged;
         Text = string.Empty;
     }
 
@@ -115,6 +159,10 @@ public class Step
     {
         StepNumber = stepNumber;
         Text = text;
+        Items = new ObservableCollection<Item>();
+        Items.CollectionChanged += CollectionChanged;
+        MediaFiles = new ObservableCollection<MediaFile>();
+        MediaFiles.CollectionChanged += CollectionChanged;
     }
     public Step(int stepNumber, List<GameObject> items = null, List<MediaFile> mediaFiles = null, string text = null)
     {
@@ -133,12 +181,15 @@ public class Step
         {
             foreach (var item in items)
             {
-                Items.Add(new Item(item));
+                var tmp = new Item(item);
+                tmp.PropertyChanged += Item_PropertyChanged;
+                Items.Add(tmp);
             }
         }
         else
         {
-            Items = new List<Item>();
+            Items = new ObservableCollection<Item>();
+            Items.CollectionChanged += CollectionChanged;
         }
 
         if(mediaFiles != null)
@@ -150,8 +201,25 @@ public class Step
         }
         else
         {
-            MediaFiles = new List<MediaFile>();
+            MediaFiles = new ObservableCollection<MediaFile>();
+            MediaFiles.CollectionChanged += CollectionChanged;
         }
+    }
+
+    public void AddItem(Item item)
+    {
+        Items.Add(item);
+        item.PropertyChanged += Item_PropertyChanged;
+
+    }
+    public void AddMediaFile(MediaFile mediaFile)
+    {
+        MediaFiles.Add(mediaFile);
+    }
+
+    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        NotifyPropertyChanged(sender.ToString() +" "+ e.PropertyName);
     }
 }
 
@@ -184,10 +252,40 @@ public enum MediaType
 }
 
 [System.Serializable]
-public class Item
+public class Item: INotifyPropertyChanged
 {
-    public ItemType Type;
-    public SerializableTransform Transform;
+    private ItemType _type;
+    public ItemType Type
+    {
+        get
+        {
+            return this._type;
+        }
+        set
+        {
+            if (value != this._type)
+            {
+                this._type = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+    private SerializableTransform _transform;
+    public SerializableTransform Transform
+    {
+        get
+        {
+            return this._transform;
+        }
+        set
+        {
+            if (value != this._transform)
+            {
+                this._transform = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
     public float[] Color;
     public bool IsActive = false;
     public bool HasText = false;
@@ -197,10 +295,18 @@ public class Item
     [XmlIgnoreAttribute]
     public GameObject _gameObject;
 
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
     public Item()
     {
         Type = ItemType.Unknown;
-        Transform = new SerializableTransform();
+        _transform = new SerializableTransform();
         Color = new float[] { 0, 0, 0, 0 };
     }
 
@@ -209,7 +315,7 @@ public class Item
         Type = ItemAsGameObject.GetComponent<ItemTypeScript>().ItemType;
         _gameObject = ItemAsGameObject;
         var visual = ItemAsGameObject.transform.Find("Visual");
-        Transform = new SerializableTransform(visual, false);
+        _transform = new SerializableTransform(visual, false);
         var renderer = visual.gameObject.GetComponentInChildren<MeshRenderer>();
         Color = new float[] {   renderer.material.color.r,
                                 renderer.material.color.g,
@@ -224,13 +330,13 @@ public class Item
         }
     }
 
+
     public void UpdateTransforms()
     {
         if (_gameObject != null)
         {
             var visual = _gameObject.transform.Find("Visual");
             Transform = new SerializableTransform(visual, false);
-
             if(HasText)
             {
                 var tooltip = visual.transform.Find("Simple Line ToolTip");

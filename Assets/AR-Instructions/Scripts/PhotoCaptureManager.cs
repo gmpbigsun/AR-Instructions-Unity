@@ -12,9 +12,13 @@ using UnityEngine.XR.WSA.WebCam;
 
 public class PhotoCaptureManager: MonoBehaviour
 {
-    public string MediaPath = "media";
-    public GameObject CameraBorder;
-    public string CameraText = "Air tap to take a photo.";
+    [SerializeField]
+    private string MediaPath = "media";
+    [SerializeField]
+    private GameObject CameraBorder;
+    [SerializeField]
+    private string CameraText = "Air tap to take a photo.";
+    
     public PhotoFinishedEvent OnPhotoFinished;
 
     private PhotoCapture _photoCaptureObject = null;

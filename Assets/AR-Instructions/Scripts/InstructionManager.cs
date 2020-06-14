@@ -3,6 +3,7 @@ using Microsoft.MixedReality.Toolkit.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -47,8 +48,8 @@ public class InstructionManager : Singleton<InstructionManager>
     /// </summary>
     public string CurrentInstructionText
     {
-        get { return Instruction.Steps[CurrentStepNumber].Text; }
-        set { Instruction.Steps[CurrentStepNumber].Text = value; }
+        get { return null; }//Instruction.Steps[CurrentStepNumber].Text; }
+        //set { Instruction.Steps[CurrentStepNumber].Text = value; }
     }
 
     public void SelectInstruction(Instruction instruction)
@@ -137,7 +138,7 @@ public class InstructionManager : Singleton<InstructionManager>
         Debug.Log(name);
         Instruction = null;
         Instruction = new Instruction(name, dateCreated);
-        Instruction.Steps.Add(new Step(CurrentStepNumber));
+        //Instruction.Steps.Add(new Step(CurrentStepNumber));
         Save(true, Application.persistentDataPath);
         UpdateFileNames();
 
@@ -210,7 +211,8 @@ public class InstructionManager : Singleton<InstructionManager>
     /// <returns></returns>
     internal Step GetCurrentStep()
     {
-        return Instruction.Steps[CurrentStepNumber];
+        //return Instruction.Steps[CurrentStepNumber];
+        return null;
     }
 
     /// <summary>
@@ -225,7 +227,7 @@ public class InstructionManager : Singleton<InstructionManager>
             item._gameObject.GetComponentInChildren<ToolTip>().ToolTipText = item.Text;
             _toolTipTextCounter++;
         }
-        Instruction.Steps[CurrentStepNumber].Items.Add(item);
+        //Instruction.Steps[CurrentStepNumber].Items.Add(item);
     }
 
     /// <summary>
@@ -234,7 +236,8 @@ public class InstructionManager : Singleton<InstructionManager>
     /// <returns></returns>
     internal bool NextStepAvailabe()
     {
-        return CurrentStepNumber + 1 == Instruction.Steps.Count ? false : true;
+        //return CurrentStepNumber + 1 == Instruction.Steps.Count ? false : true;
+        return true;
     }
 
     /// <summary>
@@ -244,7 +247,7 @@ public class InstructionManager : Singleton<InstructionManager>
     {
         CurrentStepNumber++;
         _toolTipTextCounter = 1;
-        Instruction.Steps.Add(new Step(CurrentStepNumber));
+        //Instruction.Steps.Add(new Step(CurrentStepNumber));
     }
 
     /// <summary>
@@ -260,7 +263,7 @@ public class InstructionManager : Singleton<InstructionManager>
 
         for (int i = 0; i < lines.Count; i++)
         {
-            Instruction.Steps.Add(new Step(i, lines[i]));
+            //Instruction.Steps.Add(new Step(i, lines[i]));
         }
         Save();
     }
@@ -269,9 +272,9 @@ public class InstructionManager : Singleton<InstructionManager>
     /// Get all media files of the current step
     /// </summary>
     /// <returns></returns>
-    internal List<MediaFile> GetCurrentMediaFiles()
+    internal ObservableCollection<MediaFile> GetCurrentMediaFiles()
     {
-        return Instruction.Steps[CurrentStepNumber].MediaFiles;
+        return null;// Instruction.Steps[CurrentStepNumber].MediaFiles;
     }
 
     /// <summary>
@@ -285,13 +288,13 @@ public class InstructionManager : Singleton<InstructionManager>
         {
             CurrentStepNumber++;
             _toolTipTextCounter = 1;
-            foreach (var item in Instruction.Steps[CurrentStepNumber].Items)
-            {
-                if(item.HasText)
-                {
-                    _toolTipTextCounter++;
-                }
-            }
+            //foreach (var item in Instruction.Steps[CurrentStepNumber].Items)
+            //{
+            //    if(item.HasText)
+            //    {
+            //        _toolTipTextCounter++;
+            //    }
+            //}
             return true;
         }
         else
@@ -321,13 +324,13 @@ public class InstructionManager : Singleton<InstructionManager>
             CurrentStepNumber--;
 
             _toolTipTextCounter = 1;
-            foreach (var item in Instruction.Steps[CurrentStepNumber].Items)
-            {
-                if (item.HasText)
-                {
-                    _toolTipTextCounter++;
-                }
-            }
+            //foreach (var item in Instruction.Steps[CurrentStepNumber].Items)
+            //{
+            //    if (item.HasText)
+            //    {
+            //        _toolTipTextCounter++;
+            //    }
+            //}
 
             return true;
         }

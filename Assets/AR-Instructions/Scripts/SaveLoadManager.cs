@@ -12,17 +12,17 @@ public class SaveLoadManager : Singleton<SaveLoadManager>
     {
 
         // this should be done in a more clever way. UpdateTransform is called for every gameobject even if the data not changed
-        foreach (var step in instruction.Steps)
-        {
-            foreach (var item in step.Items)
-            {
-                item.UpdateTransforms();
-                if (item._gameObject != null)
-                {
-                    item.IsActive = item._gameObject.transform.Find("Visual").gameObject.activeSelf;
-                }
-            }
-        }
+        //foreach (var step in instruction.Steps)
+        //{
+        //    foreach (var item in step.Items)
+        //    {
+        //        item.UpdateTransforms();
+        //        if (item._gameObject != null)
+        //        {
+        //            item.IsActive = item._gameObject.transform.Find("Visual").gameObject.activeSelf;
+        //        }
+        //    }
+        //}
 
         if (sync)
         {

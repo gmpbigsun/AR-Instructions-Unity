@@ -9,6 +9,10 @@ public class LoadImageToQuad : MonoBehaviour
 {
     public Material DefaultMaterial;
 
+    /// <summary>
+    /// loads an image to the quad by file name.
+    /// </summary>
+    /// <param name="fileName">if file name equals null, a default image is loaded</param>
     public void LoadImageToQuadByFileName(string fileName = null)
     {
         var videoPlayer = GetComponent<VideoPlayer>();
