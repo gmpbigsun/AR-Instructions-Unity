@@ -28,12 +28,7 @@ public class PhotoVideoPanelController : MonoBehaviour
     private GameObject DeleteButton;
     [SerializeField]
     private ObservableCollection<MediaFile> _mediaFiles;
-
-    public UnityEvent OnNewData;
-
     
-
-
     private int _currentMediaIndex;
     //private List<MediaFile> _mediaFiles;
     private MenuMode _mode;
@@ -93,7 +88,6 @@ public class PhotoVideoPanelController : MonoBehaviour
                 LoadMediaFile(_mediaFiles[_currentMediaIndex]);
 
                 PreviousMediaFileButton.gameObject.SetActive(true);
-
                
                 if (_currentMediaIndex + 1 >= _mediaFiles.Count)
                 {
@@ -147,7 +141,6 @@ public class PhotoVideoPanelController : MonoBehaviour
             _mediaFiles.Add(new MediaFile(fileName, MediaType.Image));
             SetUIForLatestMediaFile();
             DeleteButton.SetActive(true);
-            NewData();
         }
     }
 
@@ -158,7 +151,6 @@ public class PhotoVideoPanelController : MonoBehaviour
             _mediaFiles.Add(new MediaFile(fileName, MediaType.Video));
             SetUIForLatestMediaFile();
             DeleteButton.SetActive(true);
-            NewData();
         }
     }
 
@@ -173,11 +165,7 @@ public class PhotoVideoPanelController : MonoBehaviour
         NextMediaFileButton.gameObject.SetActive(false);
     }
 
-    private void NewData()
-    {
-        OnNewData?.Invoke();
-        //InstructionManager.Instance.Save();
-    }
+    
 
     /// <summary>
     /// Sets the text of the the current selected media file / count of media files
@@ -223,12 +211,5 @@ public class PhotoVideoPanelController : MonoBehaviour
         {
             LoadPreivousMediaFile();
         }
-        OnNewData?.Invoke();
-        //InstructionManager.Instance.Save();
-
-        //if (_currentMediaIndex > 0)
-        //{
-        //    _currentMediaIndex--;
-        //}
     }
 }

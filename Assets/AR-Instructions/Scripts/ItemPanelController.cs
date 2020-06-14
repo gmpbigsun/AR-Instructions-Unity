@@ -75,16 +75,10 @@ public class ItemPanelController : MonoBehaviour
     //}
 }
 
-[System.Serializable]
-public class ColorSelected : UnityEvent<Material>
-{
-}
+
 
 [System.Serializable]
 public class TooltipSelected : UnityEvent<bool>
 {
 }
-[System.Serializable]
-public class ItemSelected : UnityEvent<GameObject>
-{
-}
+
