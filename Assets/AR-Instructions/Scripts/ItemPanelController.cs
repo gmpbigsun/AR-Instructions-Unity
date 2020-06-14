@@ -77,8 +77,4 @@ public class ItemPanelController : MonoBehaviour
 
 
 
-[System.Serializable]
-public class TooltipSelected : UnityEvent<bool>
-{
-}
 
